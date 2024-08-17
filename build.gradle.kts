@@ -7,11 +7,10 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
-    mavenLocal()
-    maven("https://jitpack.io")
+    maven("https://maven.serble.net/snapshots/")
 }
 
 dependencies {
-    implementation("com.github.Mangolise:mango-game-sdk:main-SNAPSHOT")
+    implementation("net.mangolise:mango-game-sdk:latest")
     implementation("net.minestom:minestom-snapshots:6c5cd6544e")
 }
