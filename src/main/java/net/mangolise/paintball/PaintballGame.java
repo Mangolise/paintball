@@ -11,17 +11,11 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.attribute.Attribute;
-import net.minestom.server.event.player.PlayerEntityInteractEvent;
 import net.minestom.server.event.player.PlayerPacketEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.anvil.AnvilLoader;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.network.packet.client.ClientPacket;
-import net.minestom.server.network.packet.client.common.ClientKeepAlivePacket;
 import net.minestom.server.network.packet.client.play.ClientInteractEntityPacket;
-import net.minestom.server.network.packet.client.play.ClientPlayerPositionAndRotationPacket;
-import net.minestom.server.network.packet.client.play.ClientPlayerPositionPacket;
-import net.minestom.server.network.packet.client.play.ClientPlayerRotationPacket;
 import net.minestom.server.tag.Tag;
 
 import java.util.*;
@@ -34,11 +28,15 @@ public class PaintballGame extends BaseGame<PaintballGame.Config> {
     }
 
     @Override
-    public void start(Set<Player> players) {
+    public void setup() {
+        //super.setup();
+
         Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(new AnvilLoader("worlds/fruit"));
         instance.enableAutoChunkLoad(true);
 
-        Log.logger().info("Starting Paintball game with {} players", players.size());
+        Log.logger().info("Starting Paintball game with {} players", MinecraftServer.getConnectionManager().getOnlinePlayers().size());
+
+        Collection<Player> players = MinecraftServer.getConnectionManager().getOnlinePlayers();
 
         // Set up teams
         Map<Player, Team> player2Team = players.stream()
@@ -94,6 +92,11 @@ public class PaintballGame extends BaseGame<PaintballGame.Config> {
 //                }
 //            });
         });
+    }
+
+    @Override
+    public List<Feature<?>> features() {
+        return List.of();
     }
 
     public record PlayerConfig(Set<UUID> unlockedWeapons) {
