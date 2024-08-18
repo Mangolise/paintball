@@ -39,6 +39,6 @@ public class Test {
             throw new RuntimeException(throwable);
         });
 
-        server.start("0.0.0.0", 25565);
+        server.start("0.0.0.0", Util.getConfiguredPort());
     }
 }
