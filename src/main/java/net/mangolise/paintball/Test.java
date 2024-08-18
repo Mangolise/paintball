@@ -6,6 +6,7 @@ import net.mangolise.gamesdk.util.Util;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
+import net.minestom.server.extras.bungee.BungeeCordProxy;
 
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,10 @@ public class Test {
                 .exceptionally(throwable -> {
             throw new RuntimeException(throwable);
         });
+
+        if (Util.useBungeeCord()) {
+            BungeeCordProxy.enable();
+        }
 
         server.start("0.0.0.0", Util.getConfiguredPort());
     }
