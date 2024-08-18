@@ -37,7 +37,7 @@ public class Test {
                     ), Map.of());
 
                     PaintballGame game = new PaintballGame(config);
-                    game.start(players);
+                    game.setup();
                 })
                 .exceptionally(throwable -> {
             throw new RuntimeException(throwable);
