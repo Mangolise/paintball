@@ -1,18 +1,29 @@
 package net.mangolise.paintball.weapon;
 
 import net.kyori.adventure.text.Component;
-import net.minestom.server.instance.block.Block;
+import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import net.minestom.server.particle.Particle;
 import net.minestom.server.tag.Tag;
 
 import java.util.Locale;
 
 public enum Weapon {
-    GOOP_DE_GOOP(
-            Component.text("Goop de Goop"),
-            Material.SLIME_BALL,
-            context -> context.shootProjectile(Block.SLIME_BLOCK, 0.1, 10)
+    FROUP_DE_FROUP(
+            Component.text("Froup de Froup"),
+            Material.FLINT_AND_STEEL,
+            context -> {
+                switch (context) {
+                    case WeaponAction.HitPlayerContext hit -> {
+                        hit.shootParticles(Particle.FLAME);
+                        hit.target().damage(Damage.fromPlayer(context.player(), 2));
+                    }
+                    case WeaponAction.MissContext miss -> {
+                        miss.shootParticles(Particle.SMOKE);
+                    }
+                }
+            }
     ),
     ;
 

@@ -1,11 +1,12 @@
-package net.mangolise.paintball;
+package net.mangolise.paintball.weapon;
 
-import net.mangolise.paintball.weapon.WeaponAction;
+import net.mangolise.paintball.PaintballGame;
+import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
 
-public record PlayerWeaponContext(PaintballGame game, Player player, Player target) implements WeaponAction.Context {
+record PlayerMissWeaponContext(PaintballGame game, Player player, Point hitPosition) implements WeaponAction.MissContext {
 
     @Override
     public Instance instance() {
