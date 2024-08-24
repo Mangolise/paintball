@@ -2,7 +2,6 @@ package net.mangolise.paintball;
 
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.mangolise.gamesdk.BaseGame;
-import net.mangolise.gamesdk.features.PacketDebugFeature;
 import net.mangolise.gamesdk.log.Log;
 import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.mangolise.paintball.weapon.UseWeaponFeature;
@@ -12,13 +11,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.attribute.Attribute;
-import net.minestom.server.event.player.PlayerPacketEvent;
 import net.minestom.server.instance.Instance;
-import net.minestom.server.network.packet.client.ClientPacket;
-import net.minestom.server.network.packet.client.common.ClientKeepAlivePacket;
-import net.minestom.server.network.packet.client.play.ClientPlayerPositionAndRotationPacket;
-import net.minestom.server.network.packet.client.play.ClientPlayerPositionPacket;
-import net.minestom.server.network.packet.client.play.ClientPlayerRotationPacket;
 import net.minestom.server.tag.Tag;
 
 import java.util.*;
