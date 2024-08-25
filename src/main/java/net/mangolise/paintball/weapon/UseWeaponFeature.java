@@ -41,7 +41,6 @@ public record UseWeaponFeature() implements Game.Feature<PaintballGame> {
 
             // if the player is holding a weapon, use it
             weapon.action().execute(new PlayerHitPlayerWeaponContext(game, player, target, hitPosition));
-            player.sendMessage(Component.text("You hit " + target.getUsername()));
         });
 
         instance.eventNode().addListener(PlayerPacketEvent.class, event -> {

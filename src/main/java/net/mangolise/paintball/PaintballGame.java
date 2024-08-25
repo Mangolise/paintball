@@ -59,6 +59,7 @@ public class PaintballGame extends BaseGame<PaintballGame.Config> {
             player.getAttribute(Attribute.PLAYER_BLOCK_INTERACTION_RANGE).setBaseValue(1000);
 
             player.getInventory().setItemStack(0, Weapon.FROUP_DE_FROUP.displayItem());
+            player.getInventory().setItemStack(1, Weapon.RAILORD.displayItem());
 
 //            player.eventNode().addListener(PlayerPacketEvent.class, event -> {
 //                ClientPacket packet = event.getPacket();
@@ -75,7 +76,10 @@ public class PaintballGame extends BaseGame<PaintballGame.Config> {
 
     @Override
     public List<Feature<?>> features() {
-        return List.of(new UseWeaponFeature(), new DeathFeature(true));
+        return List.of(
+                new UseWeaponFeature(),
+                new DeathFeature(5)
+        );
     }
 
     public record PlayerConfig(Set<UUID> unlockedWeapons) {

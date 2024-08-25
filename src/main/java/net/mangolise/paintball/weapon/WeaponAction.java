@@ -22,14 +22,14 @@ public interface WeaponAction {
 
         Point hitPosition();
 
-        default void shootParticles(Particle particle) {
+        default void shootParticles(Particle particle, double stepSize) {
             // shoot particles in the direction the player is looking
             Vec start = Vec.fromPoint(eyePosition());
             Vec end = Vec.fromPoint(hitPosition());
 
-            Vec step = end.sub(start).normalize().mul(0.2);
+            Vec step = end.sub(start).normalize().mul(stepSize);
 
-            while (start.distanceSquared(end) > 0.1) {
+            while (start.distanceSquared(end) >= stepSize) {
                 start = start.add(step);
                 ParticlePacket packet = new ParticlePacket(particle, true, start.x(), start.y(), start.z(), 0, 0, 0, 0, 1);
                 instance().sendGroupedPacket(packet);
