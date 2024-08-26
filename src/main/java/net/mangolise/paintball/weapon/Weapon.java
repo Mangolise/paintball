@@ -32,9 +32,11 @@ public enum Weapon {
                 case WeaponAction.HitPlayerContext hit -> {
                     hit.shootParticles(Particle.FLAME, 2);
                     hit.target().damage(Damage.fromPlayer(context.player(), 2));
+                    PaintballUtils.setWeaponCooldown(hit.player(), 0.3);
                 }
                 case WeaponAction.MissContext miss -> {
                     miss.shootParticles(Particle.ASH, 2);
+                    PaintballUtils.setWeaponCooldown(miss.player(), 0.2);
                 }
             }
         },
@@ -73,7 +75,7 @@ public enum Weapon {
 
                     // send explosion if the player will die
                     if (willDie) {
-                        ParticlePacket packet = new ParticlePacket(Particle.WHITE_SMOKE, hit.hitPosition(), Vec.ZERO, 0.1f, (int) Math.pow(combo, 2));
+                        ParticlePacket packet = new ParticlePacket(Particle.WHITE_SMOKE, hit.hitPosition(), Vec.ZERO, 2.0f, (int) Math.pow(combo, 2));
                         hit.instance().sendGroupedPacket(packet);
                     }
                 }
