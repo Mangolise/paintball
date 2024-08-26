@@ -25,10 +25,14 @@ public record DeathFeature(@Nullable Integer spectatorTime) implements Game.Feat
                     event.setCancelled(true);
                     player.setGameMode(GameMode.SPECTATOR);
                     player.heal();
+                    player.updateViewableRule(viewer -> viewer.getGameMode() == GameMode.SPECTATOR);
 
                     Timer.countDownForPlayer(spectatorTime, player).thenRun(() -> {
                         player.teleport(player.getRespawnPoint())
-                                .thenRun(() -> player.setGameMode(GameMode.ADVENTURE));
+                                .thenRun(() -> {
+                                    player.setGameMode(GameMode.ADVENTURE);
+                                    player.updateViewableRule(viewer -> true);
+                                });
                     });
                 } else {
                     player.kill();
