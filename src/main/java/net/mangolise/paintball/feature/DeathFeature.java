@@ -1,4 +1,4 @@
-package net.mangolise.paintball;
+package net.mangolise.paintball.feature;
 
 import net.mangolise.gamesdk.Game;
 import net.mangolise.gamesdk.util.Timer;

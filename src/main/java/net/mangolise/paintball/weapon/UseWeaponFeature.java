@@ -3,9 +3,11 @@ package net.mangolise.paintball.weapon;
 import net.kyori.adventure.text.Component;
 import net.mangolise.gamesdk.Game;
 import net.mangolise.paintball.PaintballGame;
+import net.mangolise.paintball.util.PaintballUtils;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
+import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.player.PlayerPacketEvent;
 import net.minestom.server.instance.Instance;
@@ -27,6 +29,10 @@ public record UseWeaponFeature() implements Game.Feature<PaintballGame> {
             // we only care about one of the two hands
             if (entityInteractAt.hand() != Player.Hand.MAIN) return;
 
+            // if the player is on cooldown, don't do anything
+            if (PaintballUtils.hasWeaponCooldown(player)) return;
+            if (player.getGameMode() == GameMode.SPECTATOR) return;
+
             int targetId = packet.targetId();
             Entity entity = instance.getEntityById(targetId);
             if (!(entity instanceof Player target)) return;
@@ -47,6 +53,10 @@ public record UseWeaponFeature() implements Game.Feature<PaintballGame> {
             Player player = event.getPlayer();
 
             if (!(event.getPacket() instanceof ClientPlayerBlockPlacementPacket blockPlace)) return;
+
+            // if the player is on cooldown, don't do anything
+            if (PaintballUtils.hasWeaponCooldown(player)) return;
+            if (player.getGameMode() == GameMode.SPECTATOR) return;
 
             // check if the player is holding a weapon
             if (player.getInventory().getItemInMainHand().isAir()) return;

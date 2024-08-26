@@ -26,8 +26,12 @@ public interface WeaponAction {
             // shoot particles in the direction the player is looking
             Vec start = Vec.fromPoint(eyePosition());
             Vec end = Vec.fromPoint(hitPosition());
+            Vec playerFacingDir = end.sub(start).normalize();
 
-            Vec step = end.sub(start).normalize().mul(stepSize);
+            // we offset the start position a bit so the particles don't spawn in front of the player eyes
+//            start = start.add(playerFacingDir.rotateAroundY(Math.PI / 8).mul(0.5);
+
+            Vec step = playerFacingDir.mul(stepSize);
 
             while (start.distanceSquared(end) >= stepSize) {
                 start = start.add(step);

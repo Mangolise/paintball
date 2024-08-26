@@ -4,6 +4,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.mangolise.gamesdk.BaseGame;
 import net.mangolise.gamesdk.log.Log;
 import net.mangolise.gamesdk.util.GameSdkUtils;
+import net.mangolise.paintball.feature.DeathFeature;
+import net.mangolise.paintball.feature.DeathToastFeature;
 import net.mangolise.paintball.weapon.UseWeaponFeature;
 import net.mangolise.paintball.weapon.Weapon;
 import net.minestom.server.MinecraftServer;
@@ -78,7 +80,8 @@ public class PaintballGame extends BaseGame<PaintballGame.Config> {
     public List<Feature<?>> features() {
         return List.of(
                 new UseWeaponFeature(),
-                new DeathFeature(5)
+                new DeathFeature(5),
+                new DeathToastFeature()
         );
     }
 
