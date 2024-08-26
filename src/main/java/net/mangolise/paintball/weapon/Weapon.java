@@ -73,7 +73,7 @@ public enum Weapon {
 
                     // send explosion if the player will die
                     if (willDie) {
-                        ParticlePacket packet = new ParticlePacket(Particle.WHITE_SMOKE, hit.hitPosition(), Vec.ZERO, 0.1f, 8 * combo);
+                        ParticlePacket packet = new ParticlePacket(Particle.WHITE_SMOKE, hit.hitPosition(), Vec.ZERO, 0.1f, (int) Math.pow(combo, 2));
                         hit.instance().sendGroupedPacket(packet);
                     }
                 }
