@@ -3,19 +3,14 @@ package net.mangolise.paintball.weapon;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
-import net.minestom.server.component.DataComponent;
-import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.damage.Damage;
-import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.item.component.Food;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.tag.Tag;
 
-import java.util.List;
 import java.util.Locale;
 
 public enum Weapon {
@@ -51,17 +46,17 @@ public enum Weapon {
 
                     hit.player().playSound(Sound.sound(builder -> builder
                             .type(Key.key("block.beacon.activate"))
-                            .volume(0.5f)
+                            .volume(1f - (1f / (float) (combo + 1)))
                             .source(Sound.Source.PLAYER)
                             .seed((int) (Math.random() * 1000))
-                            .pitch(1.0f / combo)));
+                            .pitch(1.0f / ((float) combo * 0.2f))));
 
                     boolean willDie = hit.target().getHealth() - damage.getAmount() <= 0;
                     if (hit.target().damage(damage)) return;
 
                     // send explosion if the player will die
                     if (willDie) {
-                        ParticlePacket packet = new ParticlePacket(Particle.WHITE_SMOKE, hit.hitPosition(), Vec.ZERO, 0.1f, 64);
+                        ParticlePacket packet = new ParticlePacket(Particle.WHITE_SMOKE, hit.hitPosition(), Vec.ZERO, 0.1f, 8 * combo);
                         hit.instance().sendGroupedPacket(packet);
                     }
                 }
@@ -72,7 +67,7 @@ public enum Weapon {
                     miss.player().setTag(combo_tag, 0);
                     miss.player().playSound(Sound.sound(builder -> builder
                             .type(Key.key("block.beacon.deactivate"))
-                            .volume(0.5f)
+                            .volume(1f)
                             .source(Sound.Source.PLAYER)
                             .pitch(1.0f)));
                     miss.shootParticles(Particle.SMOKE, 0.1);
