@@ -1,5 +1,6 @@
 package net.mangolise.paintball;
 
+import net.hollowcube.polar.PolarLoader;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.mangolise.gamesdk.BaseGame;
 import net.mangolise.gamesdk.log.Log;
@@ -14,7 +15,10 @@ import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.registry.DynamicRegistry;
 import net.minestom.server.tag.Tag;
+import net.minestom.server.world.DimensionType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,9 +33,17 @@ public class PaintballGame extends BaseGame<PaintballGame.Config> {
 
     @Override
     public void setup() {
-        Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(GameSdkUtils.getPolarLoaderFromResource("worlds/fruit.polar"));
-        instance.enableAutoChunkLoad(true);
-        setTag(INSTANCE_TAG, instance);
+        Instance instance;
+        {
+            PolarLoader loader = GameSdkUtils.getPolarLoaderFromResource("worlds/" + config.map() + ".polar");
+            if (config.dimension == null) {
+                instance = MinecraftServer.getInstanceManager().createInstanceContainer(loader);
+            } else {
+                instance = MinecraftServer.getInstanceManager().createInstanceContainer(config.dimension, loader);
+            }
+            instance.enableAutoChunkLoad(true);
+            setTag(INSTANCE_TAG, instance);
+        }
 
         Log.logger().info("Starting Paintball game with {} players", MinecraftServer.getConnectionManager().getOnlinePlayers().size());
 
@@ -96,6 +108,6 @@ public class PaintballGame extends BaseGame<PaintballGame.Config> {
      * @param playerCount the player count of the game. The game starts when this many players have joined
      * @param teams the teams in the game
      */
-    public record Config(int playerCount, List<Team> teams, Map<UUID, PlayerConfig> players) {
+    public record Config(int playerCount, List<Team> teams, @Nullable DynamicRegistry.Key<DimensionType> dimension, String map, Map<UUID, PlayerConfig> players) {
     }
 }

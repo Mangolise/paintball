@@ -1,20 +1,18 @@
 package net.mangolise.paintball;
 
-import dev.emortal.rayfast.vector.Vector3d;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.mangolise.gamesdk.limbo.Limbo;
 import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.extras.bungee.BungeeCordProxy;
+import net.minestom.server.registry.DynamicRegistry;
+import net.minestom.server.world.DimensionType;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 // This is a dev server, not used in production
 public class Test {
+
     public static void main(String[] args) {
 
         MinecraftServer server = MinecraftServer.init();
@@ -22,23 +20,14 @@ public class Test {
 
         InitRayfast.init();
 
+        // initialise the dimension type
+        var ignored = DimensionTypes.FULLBRIGHT;
+
         Limbo.waitForPlayers(2)
                 .thenAccept(playerSet -> {
                     List<Player> players = List.copyOf(playerSet);
 
-                    PaintballGame.Config config = new PaintballGame.Config(2, List.of(
-                            new PaintballGame.Team(
-                                    NamedTextColor.RED,
-                                    new Pos(-12.5, 65, 13.5, -135, 0),
-                                    Set.of(players.get(0).getUuid())
-                            ),
-                            new PaintballGame.Team(
-                                    NamedTextColor.BLUE,
-                                    new Pos(13.5, 65, -12.5, 45, 0),
-                                    Set.of(players.get(1).getUuid())
-                            )
-                    ), Map.of());
-
+                    PaintballGame.Config config = MapConfigs.SHRINE.configCreator().apply(players);
                     PaintballGame game = new PaintballGame(config);
 
                     try {
