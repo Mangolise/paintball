@@ -3,102 +3,65 @@ package net.mangolise.paintball.weapon;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
-import net.mangolise.paintball.util.PaintballUtils;
-import net.minestom.server.MinecraftServer;
-import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.damage.Damage;
-import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.network.packet.server.play.ParticlePacket;
-import net.minestom.server.network.packet.server.play.SetCooldownPacket;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.tag.Tag;
-import org.jetbrains.annotations.Nullable;
+import static net.mangolise.paintball.weapon.WeaponAction.*;
 
 import java.util.Locale;
 
 public enum Weapon {
-
-    // TODO: Cleanup weapon handling.
-    // - move PaintballUtils.setWeaponCooldown to WeaponAction.Context
-    // - remove duplicate damage calculations
-    // - unify damage deal handling
     FROUP_DE_FROUP(
         Component.text("Froup de Froup"),
         ItemStack.of(Material.FLINT_AND_STEEL),
-        context -> {
-            switch (context) {
-                case WeaponAction.HitPlayerContext hit -> {
-                    hit.shootParticles(Particle.FLAME, 2);
-                    hit.target().damage(Damage.fromPlayer(context.player(), 2));
-                    PaintballUtils.setWeaponCooldown(hit.player(), 0.3);
-                }
-                case WeaponAction.MissContext miss -> {
-                    miss.shootParticles(Particle.ASH, 2);
-                    PaintballUtils.setWeaponCooldown(miss.player(), 0.2);
-                }
-            }
-        },
-        null
+        new Actions.SetDamage(1.5),
+
+        onHit(new Actions.HitscanParticle(Particle.FLAME, 2)),
+        onMiss(new Actions.HitscanParticle(Particle.ASH, 2)),
+
+        onHit(new Actions.SetCooldown(1.0 / 5.1)),
+        onMiss(new Actions.SetCooldown(0.1)),
+
+        onHit(new Actions.ApplyDamage())
     ),
+
     RAILORD(
         Component.text("Railord"),
         ItemStack.of(Material.RAIL),
-        context -> {
-            Tag<Integer> combo_tag = Tag.Integer("railord_combo").defaultValue(0);
-            switch (context) {
-                case WeaponAction.HitPlayerContext hit -> {
-                    hit.shootParticles(Particle.SCULK_CHARGE, 0.75);
-                    int combo = Math.min(hit.player().getTag(combo_tag), 8);
 
-                    // double the damage every hit
-                    hit.player().setTag(combo_tag, combo + 1);
-                    Damage damage = Damage.fromPlayer(context.player(), (float) ((2.0 * Math.pow(1.5, combo)) - 1.0));
-                    Damage nextDamage = Damage.fromPlayer(context.player(), (float) ((2.0 * Math.pow(1.5, combo + 1)) - 1.0));
-                    hit.player().setLevel((int) nextDamage.getAmount());
-                    hit.player().setExp((float) combo / 8f);
+        onHit(new Actions.HitscanParticle(Particle.SCULK_CHARGE, 0.75)),
+        onMiss(new Actions.HitscanParticle(Particle.SMOKE, 0.1)),
 
-                    Sound sound = Sound.sound(builder -> builder
-                            .type(Key.key("block.beacon.activate"))
-                            .volume(1f - (1f / (float) (combo + 1)))
-                            .source(Sound.Source.PLAYER)
-                            .seed((int) (Math.random() * 1000))
-                            .pitch(1.0f / ((float) combo * 0.2f)));
-                    hit.player().playSound(sound);
+        // modify and show combo
+        onHit(new Actions.ModifyCombo(combo -> Math.min(8, combo + 1))),
+        onMiss(new Actions.ModifyCombo(combo -> 0)),
+        lazy(context -> new Actions.SetChargeBar(context.player().getTag(WeaponTags.COMBO_TAG) / 8f)),
+        new Actions.ApplyCombo((damage, combo) -> damage * Math.pow(1.5, combo)),
 
-                    // short cooldown
-                    PaintballUtils.setWeaponCooldown(hit.player(), 1);
+        onHit(context -> {
+            double combo = context.player().getTag(WeaponTags.COMBO_TAG);
+            Sound sound = Sound.sound(builder -> builder
+                    .type(Key.key("block.beacon.activate"))
+                    .volume(1f - (1f / (float) (combo + 1)))
+                    .source(Sound.Source.PLAYER)
+                    .seed((int) (Math.random() * 1000))
+                    .pitch(1.0f / ((float) combo * 0.2f)));
+            context.player().playSound(sound);
+        }),
 
-                    boolean willDie = hit.target().getHealth() - damage.getAmount() <= 0;
-                    hit.target().damage(damage);
+        onMiss(new Actions.PlayerSound(Sound.sound(builder -> builder
+                .type(Key.key("block.beacon.deactivate"))
+                .volume(1f)
+                .source(Sound.Source.PLAYER)
+                .pitch(1.0f)))),
 
-                    // send explosion if the player will die
-                    if (willDie) {
-                        ParticlePacket packet = new ParticlePacket(Particle.WHITE_SMOKE, hit.hitPosition(), Vec.ZERO, 2.0f, (int) Math.pow(combo, 2));
-                        hit.instance().sendGroupedPacket(packet);
-                    }
-                }
-                case WeaponAction.MissContext miss -> {
-                    if (miss.player().getTag(combo_tag) == 0) return;
+        onHit(new Actions.SetCooldown(1)),
+        onMiss(new Actions.SetCooldown(3)),
+        lazy(context -> new Actions.ExplosionOnKill(2.0, 1 + (int) Math.pow(context.player().getTag(WeaponTags.COMBO_TAG), 2))),
 
-                    // reset the combo
-                    miss.player().setTag(combo_tag, 0);
-                    miss.player().setLevel(0);
-                    miss.player().setExp(0);
-                    miss.player().playSound(Sound.sound(builder -> builder
-                            .type(Key.key("block.beacon.deactivate"))
-                            .volume(1f)
-                            .source(Sound.Source.PLAYER)
-                            .pitch(1.0f)));
-                    miss.shootParticles(Particle.SMOKE, 0.1);
-
-                    // long cooldown
-                    PaintballUtils.setWeaponCooldown(miss.player(), 3);
-                }
-            }
-        },
-        null
+        // apply damage
+        onHit(new Actions.ApplyDamage())
     ),
     ;
 
@@ -108,13 +71,12 @@ public enum Weapon {
 
     private static final Tag<String> WEAPON_ID_TAG = Tag.String("weaponId");
 
-    Weapon(Component displayName, ItemStack stack, WeaponAction action, @Nullable Runnable setup) {
+    Weapon(Component displayName, ItemStack stack, WeaponAction... action) {
         this.displayName = displayName;
         this.displayItem = stack
                 .withCustomName(displayName)
                 .withTag(Tag.String("weaponId"), name().toLowerCase(Locale.ROOT));
-        this.action = action;
-        if (setup != null) setup.run();
+        this.action = join(action);
     }
 
     public static Weapon weaponFromItemStack(ItemStack itemStack) {
