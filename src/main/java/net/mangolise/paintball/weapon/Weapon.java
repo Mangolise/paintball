@@ -6,6 +6,7 @@ import net.kyori.adventure.text.Component;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.particle.Particle;
+import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
 import static net.mangolise.paintball.weapon.WeaponAction.*;
 
@@ -42,7 +43,7 @@ public enum Weapon {
         onHit(context -> {
             double combo = context.player().getTag(WeaponTags.COMBO_TAG);
             Sound sound = Sound.sound(builder -> builder
-                    .type(Key.key("block.beacon.activate"))
+                    .type(SoundEvent.BLOCK_VAULT_ACTIVATE)
                     .volume(1f - (1f / (float) (combo + 1)))
                     .source(Sound.Source.PLAYER)
                     .seed((int) (Math.random() * 1000))
@@ -51,7 +52,7 @@ public enum Weapon {
         }),
 
         onMiss(new Actions.PlayerSound(Sound.sound(builder -> builder
-                .type(Key.key("block.beacon.deactivate"))
+                .type(SoundEvent.BLOCK_VAULT_DEACTIVATE)
                 .volume(1f)
                 .source(Sound.Source.PLAYER)
                 .pitch(1.0f)))),
@@ -61,6 +62,29 @@ public enum Weapon {
         lazy(context -> new Actions.ExplosionOnKill(2.0, 1 + (int) Math.pow(context.player().getTag(WeaponTags.COMBO_TAG), 2))),
 
         // apply damage
+        onHit(new Actions.ApplyDamage())
+    ),
+    PEW_PEW(
+        Component.text("Pew Pew"),
+        ItemStack.of(Material.BOW),
+
+        onHit(new Actions.HitscanParticle(Particle.CRIT, 1)),
+        onMiss(new Actions.HitscanParticle(Particle.SMOKE, 0.1)),
+
+        onHit(new Actions.SetCooldown(1.0 / 2.5)),
+        onMiss(new Actions.SetCooldown(0.5)),
+
+        onHit(new Actions.PlayerSound(Sound.sound(builder -> builder
+                .type(SoundEvent.ENTITY_ARROW_SHOOT)
+                .volume(1f)
+                .source(Sound.Source.PLAYER)
+                .pitch(1.0f)))),
+        onMiss(new Actions.PlayerSound(Sound.sound(builder -> builder
+                .type(SoundEvent.ENTITY_ARROW_HIT)
+                .volume(0.5f)
+                .source(Sound.Source.PLAYER)
+                .pitch(1.0f)))),
+
         onHit(new Actions.ApplyDamage())
     ),
     ;

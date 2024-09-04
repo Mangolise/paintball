@@ -13,6 +13,7 @@ repositories {
     mavenCentral()
     maven("https://maven.serble.net/snapshots/")
     maven("https://jitpack.io")
+    maven("https://reposilite.worldseed.online/public")
 }
 
 dependencies {
@@ -20,6 +21,7 @@ dependencies {
     implementation("net.minestom:minestom-snapshots:6c5cd6544e")
     implementation("dev.hollowcube:polar:1.11.1")
     implementation("com.github.EmortalMC:Rayfast:7975ac5e4c")
+    implementation("net.worldseed.multipart:WorldSeedEntityEngine:11.0.1")
 }
 
 java {
@@ -36,6 +38,11 @@ tasks.withType<Jar> {
 tasks.register("packageWorlds", net.mangolise.gamesdk.gradle.PackageWorldTask::class.java)
 tasks.processResources {
     dependsOn("packageWorlds")
+}
+
+tasks.register("packageResourcePack", net.mangolise.gradle.PackageResourcePack::class.java)
+tasks.processResources {
+    dependsOn("packageResourcePack")
 }
 
 publishing {
