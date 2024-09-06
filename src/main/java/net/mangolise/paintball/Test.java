@@ -5,16 +5,16 @@ import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.extras.bungee.BungeeCordProxy;
-import net.minestom.server.registry.DynamicRegistry;
-import net.minestom.server.world.DimensionType;
 
+import java.io.File;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 // This is a dev server, not used in production
 public class Test {
 
     public static void main(String[] args) {
-
         MinecraftServer server = MinecraftServer.init();
         MinecraftServer.getConnectionManager().setUuidProvider((connection, username) -> GameSdkUtils.createFakeUUID(username));
 
@@ -42,6 +42,13 @@ public class Test {
 
         if (GameSdkUtils.useBungeeCord()) {
             BungeeCordProxy.enable();
+        }
+
+        // setup resource pack
+        try {
+            ResourcePackServer.hook(MinecraftServer.getGlobalEventHandler(), new File("resourcepack/out.zip"), 5297);
+        } catch (IOException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
 
         server.start("0.0.0.0", GameSdkUtils.getConfiguredPort());

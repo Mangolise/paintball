@@ -22,3 +22,7 @@ gradle-app.setting
 
 .idea/*
 /src/main/resources/worlds
+/resourcepack/out/*
+/resourcepack/models/*
+resourcepack/out.zip
+resourcepack/model_mappings.json

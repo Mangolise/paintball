@@ -3,12 +3,14 @@ package net.mangolise.paintball.weapon;
 import net.kyori.adventure.text.Component;
 import net.mangolise.gamesdk.Game;
 import net.mangolise.paintball.PaintballGame;
+import net.mangolise.paintball.event.PlayerUseWeaponEvent;
 import net.mangolise.paintball.util.PaintballUtils;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
+import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.player.PlayerPacketEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.item.ItemStack;
@@ -46,7 +48,11 @@ public record UseWeaponFeature() implements Game.Feature<PaintballGame> {
             if (weapon == null) return;
 
             // if the player is holding a weapon, use it
-            weapon.action().execute(new PlayerHitPlayerWeaponContext(game, player, target, hitPosition));
+            var hitContext = new PlayerHitPlayerWeaponContext(game, player, target, hitPosition);
+            weapon.action().execute(hitContext);
+
+            PlayerUseWeaponEvent useWeaponEvent = new PlayerUseWeaponEvent(player, weapon, hitContext);
+            EventDispatcher.call(useWeaponEvent);
         });
 
         instance.eventNode().addListener(PlayerPacketEvent.class, event -> {
@@ -66,7 +72,11 @@ public record UseWeaponFeature() implements Game.Feature<PaintballGame> {
 
             // if the player is holding a weapon, use it
             Point hitPosition = blockPlace.blockPosition().add(blockPlace.cursorPositionX(), blockPlace.cursorPositionY(), blockPlace.cursorPositionZ());
-            weapon.action().execute(new PlayerMissWeaponContext(game, player, Vec.fromPoint(hitPosition)));
+            var missContext = new PlayerMissWeaponContext(game, player, Vec.fromPoint(hitPosition));
+            weapon.action().execute(missContext);
+
+            PlayerUseWeaponEvent useWeaponEvent = new PlayerUseWeaponEvent(player, weapon, missContext);
+            EventDispatcher.call(useWeaponEvent);
         });
 
     }

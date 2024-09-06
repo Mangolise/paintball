@@ -17,6 +17,5 @@ dependencies {
     implementation("dev.hollowcube:polar:1.11.1")
     implementation("net.worldseed.multipart:WorldSeedEntityEngine:11.0.1")
     implementation(gradleApi())
-    implementation("org.apache.commons:commons-lang3:3.17.0")
-
+    implementation("org.zeroturnaround:zt-zip:1.17")
 }

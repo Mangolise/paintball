@@ -5,18 +5,20 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.mangolise.gamesdk.BaseGame;
 import net.mangolise.gamesdk.log.Log;
 import net.mangolise.gamesdk.util.GameSdkUtils;
-import net.mangolise.paintball.entity.GlockModel;
-import net.mangolise.paintball.entity.GoldenModel;
+import net.mangolise.paintball.entity.ModelEntity;
+import net.mangolise.paintball.entity.ModelWrapper;
+import net.mangolise.paintball.event.PlayerDamagePlayerEvent;
+import net.mangolise.paintball.event.PlayerUseWeaponEvent;
 import net.mangolise.paintball.feature.DeathFeature;
 import net.mangolise.paintball.feature.DeathToastFeature;
 import net.mangolise.paintball.weapon.UseWeaponFeature;
 import net.mangolise.paintball.weapon.Weapon;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.attribute.Attribute;
+import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.registry.DynamicRegistry;
 import net.minestom.server.tag.Tag;
@@ -26,7 +28,6 @@ import net.worldseed.multipart.animations.AnimationHandler;
 import net.worldseed.multipart.animations.AnimationHandlerImpl;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.nio.file.Path;
@@ -91,25 +92,17 @@ public class PaintballGame extends BaseGame<PaintballGame.Config> {
                 player.getInventory().setItemStack(i, Weapon.values()[i].displayItem());
             }
 
-//            player.eventNode().addListener(PlayerPacketEvent.class, event -> {
-//                ClientPacket packet = event.getPacket();
-//                switch (packet) {
-//                    case ClientPlayerPositionPacket ignored -> {}
-//                    case ClientPlayerPositionAndRotationPacket ignored -> {}
-//                    case ClientPlayerRotationPacket ignored -> {}
-//                    case ClientKeepAlivePacket ignored -> {}
-//                    default -> Log.logger().info("Player {} sent packet {}", player.getUsername(), event.getPacket());
-//                }
-//            });
-        });
+            ModelEntity modelEntity = new ModelEntity("luger", instance, new Pos(0, 0, 0));
+            player.addPassenger(modelEntity);
 
-        GoldenModel model = new GoldenModel();
-        model.init(instance, new Pos(0, 3, 0));
-        AnimationHandler animationHandler = new AnimationHandlerImpl(model);
-        animationHandler.playRepeat("animation.bulbasaur.ground_idle");
-        for (Player player : players) {
-            model.addViewer(player);
-        }
+            player.eventNode().addListener(PlayerMoveEvent.class, event -> {
+                modelEntity.teleport(modelEntity.getPosition().withView(event.getNewPosition()));
+            });
+
+            player.eventNode().addListener(PlayerUseWeaponEvent.class, event -> {
+                modelEntity.animations().playOnce("reload", () -> {});
+            });
+        });
     }
 
     @Override

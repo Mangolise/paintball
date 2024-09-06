@@ -1,24 +1,18 @@
 package net.mangolise.gradle;
 
 import com.google.gson.Gson;
-import net.mangolise.gamesdk.log.Log;
 import net.minestom.server.MinecraftServer;
 import net.worldseed.resourcepack.PackBuilder;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.util.Comparator;
 import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import org.zeroturnaround.zip.ZipUtil;
 
 public class PackageResourcePack extends DefaultTask {
     private static final Gson GSON = new Gson();
@@ -49,7 +43,7 @@ public class PackageResourcePack extends DefaultTask {
         Files.writeString(BASE_PATH.resolve("model_mappings.json"), config.modelMappings(), Charset.defaultCharset(), StandardOpenOption.CREATE);
 
         // zip the output resourcepack
-        zipFolder(BASE_PATH.resolve("out"), BASE_PATH.resolve("out.zip"));
+        ZipUtil.pack(BASE_PATH.resolve("out").toFile(), BASE_PATH.resolve("out.zip").toFile());
 
         System.out.println("Done packaging resource pack");
     }
@@ -81,22 +75,5 @@ public class PackageResourcePack extends DefaultTask {
                 }
             });
         }
-    }
-
-    private void zipFolder(Path sourceFolder, Path zipFile) throws IOException {
-        ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFile.toFile()));
-        try (Stream<Path> stream =  Files.walk(sourceFolder)) {
-            stream.filter(path -> !Files.isDirectory(path))
-                .forEach(path -> {
-                    try {
-                        zipOut.putNextEntry(new ZipEntry(sourceFolder.relativize(path).toString()));
-                        Files.copy(path, zipOut);
-                        zipOut.closeEntry();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-        }
-        zipOut.close();
     }
 }
