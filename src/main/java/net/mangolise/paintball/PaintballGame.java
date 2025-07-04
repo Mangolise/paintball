@@ -16,6 +16,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.registry.DynamicRegistry;
+import net.minestom.server.registry.RegistryKey;
 import net.minestom.server.tag.Tag;
 import net.minestom.server.world.DimensionType;
 import org.jetbrains.annotations.Nullable;
@@ -69,8 +70,8 @@ public class PaintballGame extends BaseGame<PaintballGame.Config> {
             player.setGameMode(GameMode.ADVENTURE);
             player.setInstance(instance, team.spawnPoint());
 
-            player.getAttribute(Attribute.PLAYER_ENTITY_INTERACTION_RANGE).setBaseValue(1000);
-            player.getAttribute(Attribute.PLAYER_BLOCK_INTERACTION_RANGE).setBaseValue(1000);
+            player.getAttribute(Attribute.ENTITY_INTERACTION_RANGE).setBaseValue(1000);
+            player.getAttribute(Attribute.BLOCK_INTERACTION_RANGE).setBaseValue(1000);
 
             player.getInventory().setItemStack(0, Weapon.FROUP_DE_FROUP.displayItem());
             player.getInventory().setItemStack(1, Weapon.RAILORD.displayItem());
@@ -108,6 +109,6 @@ public class PaintballGame extends BaseGame<PaintballGame.Config> {
      * @param playerCount the player count of the game. The game starts when this many players have joined
      * @param teams the teams in the game
      */
-    public record Config(int playerCount, List<Team> teams, @Nullable DynamicRegistry.Key<DimensionType> dimension, String map, Map<UUID, PlayerConfig> players) {
+    public record Config(int playerCount, List<Team> teams, @Nullable RegistryKey<DimensionType> dimension, String map, Map<UUID, PlayerConfig> players) {
     }
 }

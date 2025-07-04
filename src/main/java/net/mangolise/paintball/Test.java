@@ -16,7 +16,6 @@ public class Test {
     public static void main(String[] args) {
 
         MinecraftServer server = MinecraftServer.init();
-        MinecraftServer.getConnectionManager().setUuidProvider((connection, username) -> GameSdkUtils.createFakeUUID(username));
 
         InitRayfast.init();
 

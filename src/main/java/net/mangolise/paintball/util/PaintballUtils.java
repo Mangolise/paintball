@@ -23,7 +23,7 @@ public class PaintballUtils {
                 .toList();
 
         List<SendablePacket> setCooldownPackets = mats.stream()
-                .<SendablePacket>map(mat -> new SetCooldownPacket(mat.id(), (int) (seconds * 20)))
+                .<SendablePacket>map(mat -> new SetCooldownPacket(mat.name(), (int) (seconds * 20)))
                 .toList();
 
         player.sendPackets(setCooldownPackets);

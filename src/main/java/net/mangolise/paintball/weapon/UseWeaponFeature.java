@@ -9,6 +9,7 @@ import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.PlayerHand;
 import net.minestom.server.event.player.PlayerPacketEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.item.ItemStack;
@@ -27,7 +28,7 @@ public record UseWeaponFeature() implements Game.Feature<PaintballGame> {
             if (!(event.getPacket() instanceof ClientInteractEntityPacket packet)) return;
             if (!(packet.type() instanceof ClientInteractEntityPacket.InteractAt entityInteractAt)) return;
             // we only care about one of the two hands
-            if (entityInteractAt.hand() != Player.Hand.MAIN) return;
+            if (entityInteractAt.hand() != PlayerHand.MAIN) return;
 
             // if the player is on cooldown, don't do anything
             if (PaintballUtils.hasWeaponCooldown(player)) return;
@@ -40,8 +41,8 @@ public record UseWeaponFeature() implements Game.Feature<PaintballGame> {
             Vec hitPosition = hitOffset.add(target.getPosition());
 
             // check if the player is holding a weapon
-            if (player.getInventory().getItemInMainHand().isAir()) return;
-            ItemStack item = player.getInventory().getItemInMainHand();
+            if (player.getItemInMainHand().isAir()) return;
+            ItemStack item = player.getItemInMainHand();
             Weapon weapon = Weapon.weaponFromItemStack(item);
             if (weapon == null) return;
 
@@ -59,8 +60,8 @@ public record UseWeaponFeature() implements Game.Feature<PaintballGame> {
             if (player.getGameMode() == GameMode.SPECTATOR) return;
 
             // check if the player is holding a weapon
-            if (player.getInventory().getItemInMainHand().isAir()) return;
-            ItemStack item = player.getInventory().getItemInMainHand();
+            if (player.getItemInMainHand().isAir()) return;
+            ItemStack item = player.getItemInMainHand();
             Weapon weapon = Weapon.weaponFromItemStack(item);
             if (weapon == null) return;
 
