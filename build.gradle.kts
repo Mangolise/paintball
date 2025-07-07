@@ -17,8 +17,8 @@ repositories {
 
 dependencies {
     implementation("net.mangolise:mango-game-sdk:latest")
-    implementation("net.minestom:minestom-snapshots:d0754f2a15")
-    implementation("dev.hollowcube:polar:1.11.1")
+    implementation("net.minestom:minestom:2025.07.03-1.21.5")
+    implementation("dev.hollowcube:polar:1.14.5")
     implementation("com.github.EmortalMC:Rayfast:7975ac5e4c")
 }
 

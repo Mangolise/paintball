@@ -2,6 +2,7 @@ package net.mangolise.paintball.weapon;
 
 import net.kyori.adventure.sound.Sound;
 import net.mangolise.paintball.util.PaintballUtils;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
@@ -81,7 +82,7 @@ public interface Actions {
             Vec step = end.sub(start).normalize().mul(stepSize);
             double distanceTraveled = 0;
             do {
-                ParticlePacket packet = new ParticlePacket(particle, true, start.x(), start.y(), start.z(), 0, 0, 0, 0, 1);
+                ParticlePacket packet = new ParticlePacket(particle, true, true, new Pos(start.x(), start.y(), start.z()), new Pos(0, 0, 0), 0, 1);
                 context.instance().sendGroupedPacket(packet);
                 start = start.add(step);
                 distanceTraveled += stepSize;
